@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iVentures Capital — Wealth Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --gold-dim: rgba(201,168,76,0.15);
+    --bg: #0A0A0A;
+    --bg2: #111111;
+    --bg3: #161616;
+    --text: #F0EDE8;
+    --text-muted: #8A8680;
+    --border: rgba(201,168,76,0.2);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Noise texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* Ambient glow */
+  .ambient {
+    position: fixed;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,168,76,0.06) 0%, transparent 70%);
+    top: -200px;
+    right: -200px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 24px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(to bottom, rgba(10,10,10,0.95), transparent);
+    backdrop-filter: blur(2px);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-mark {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .logo-mark::before {
+    content: 'iV';
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 0.5px;
+  }
+
+  .logo-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    font-weight: 400;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text);
+    opacity: 0.9;
+  }
+
+  .nav-cta {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    padding: 10px 22px;
+    transition: all 0.3s ease;
+  }
+
+  .nav-cta:hover {
+    background: var(--gold-dim);
+    border-color: var(--gold);
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 120px 48px 80px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .hero-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.2s forwards;
+  }
+
+  .hero-eyebrow-line {
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .hero-eyebrow-text {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 400;
+  }
+
+  .hero-headline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(42px, 6vw, 76px);
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+    max-width: 750px;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.4s forwards;
+  }
+
+  .hero-headline em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+
+  .hero-sub {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--text-muted);
+    max-width: 520px;
+    margin-bottom: 56px;
+    font-weight: 300;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.6s forwards;
+  }
+
+  .hero-sub strong {
+    color: var(--text);
+    font-weight: 400;
+  }
+
+  .cta-group {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.8s forwards;
+  }
+
+  .cta-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--gold);
+    color: #0A0A0A;
+    text-decoration: none;
+    padding: 18px 36px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gold-light);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .cta-primary:hover::before { transform: translateX(0); }
+  .cta-primary span { position: relative; z-index: 1; }
+
+  .cta-arrow {
+    position: relative;
+    z-index: 1;
+    font-size: 16px;
+    transition: transform 0.3s ease;
+  }
+
+  .cta-primary:hover .cta-arrow { transform: translateX(4px); }
+
+  .cta-note {
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+  }
+
+  /* DIVIDER */
+  .divider {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 48px;
+  }
+
+  .divider-line {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border), transparent);
+  }
+
+  /* WHO SECTION */
+  .who {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 100px 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .section-label-line {
+    width: 24px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .section-label-text {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .who-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(32px, 3.5vw, 48px);
+    font-weight: 300;
+    line-height: 1.2;
+    margin-bottom: 24px;
+  }
+
+  .who-body {
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+  }
+
+  .qualifier-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .qualifier-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .qualifier-list li::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+
+  /* WHAT YOU GET */
+  .what {
+    position: relative;
+    z-index: 1;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .what-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 100px 48px;
+  }
+
+  .what-header {
+    text-align: center;
+    margin-bottom: 72px;
+  }
+
+  .what-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(32px, 3.5vw, 48px);
+    font-weight: 300;
+    margin-top: 16px;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .card {
+    background: var(--bg3);
+    padding: 48px 36px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s ease;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+  }
+
+  .card:hover { background: #1a1a1a; }
+  .card:hover::before { transform: scaleX(1); }
+
+  .card-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 300;
+    color: var(--gold-dim);
+    line-height: 1;
+    margin-bottom: 24px;
+    color: rgba(201,168,76,0.2);
+  }
+
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 400;
+    margin-bottom: 16px;
+    line-height: 1.3;
+  }
+
+  .card-body {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
+
+  /* ADVISOR */
+  .advisor {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 100px 48px;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  .advisor-photo {
+    position: relative;
+  }
+
+  .advisor-photo-frame {
+    width: 100%;
+    aspect-ratio: 3/4;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .advisor-photo-frame::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 60%, rgba(201,168,76,0.08));
+  }
+
+  .photo-placeholder {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 64px;
+    font-weight: 300;
+    color: rgba(201,168,76,0.2);
+  }
+
+  .advisor-photo-accent {
+    position: absolute;
+    bottom: -12px;
+    right: -12px;
+    width: 80px;
+    height: 80px;
+    border: 1px solid var(--gold);
+    opacity: 0.3;
+  }
+
+  .advisor-info {
+    padding-top: 8px;
+  }
+
+  .advisor-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(32px, 3vw, 44px);
+    font-weight: 300;
+    margin-bottom: 6px;
+  }
+
+  .advisor-title {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 32px;
+  }
+
+  .advisor-bio {
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--text-muted);
+    margin-bottom: 40px;
+    max-width: 560px;
+  }
+
+  .stats {
+    display: flex;
+    gap: 48px;
+    padding: 32px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+
+  .stat-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 300;
+    color: var(--gold-light);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* BOTTOM CTA */
+  .bottom-cta {
+    position: relative;
+    z-index: 1;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+  }
+
+  .bottom-cta-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 100px 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .bottom-cta-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 300;
+    line-height: 1.15;
+    max-width: 700px;
+    margin-bottom: 24px;
+  }
+
+  .bottom-cta-heading em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+
+  .bottom-cta-sub {
+    font-size: 15px;
+    color: var(--text-muted);
+    margin-bottom: 48px;
+    max-width: 440px;
+    line-height: 1.7;
+  }
+
+  .cta-disclaimer {
+    margin-top: 24px;
+    font-size: 12px;
+    color: var(--text-muted);
+    opacity: 0.6;
+  }
+
+  /* FOOTER */
+  footer {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .footer-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    opacity: 0.6;
+  }
+
+  .footer-note {
+    font-size: 11px;
+    color: var(--text-muted);
+    opacity: 0.4;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    nav { padding: 20px 24px; }
+    .hero { padding: 100px 24px 60px; }
+    .who { grid-template-columns: 1fr; padding: 60px 24px; gap: 40px; }
+    .what-inner { padding: 60px 24px; }
+    .cards { grid-template-columns: 1fr; }
+    .advisor { grid-template-columns: 1fr; padding: 60px 24px; gap: 40px; }
+    .advisor-photo { max-width: 220px; }
+    .bottom-cta-inner { padding: 60px 24px; }
+    .stats { gap: 32px; }
+    footer { padding: 24px; flex-direction: column; gap: 12px; text-align: center; }
+    .cta-group { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ambient"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <div class="logo-mark"></div>
+    <span class="logo-text">iVentures Capital</span>
+  </div>
+  <a href="#book" class="nav-cta">Book a Call</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">
+    <div class="hero-eyebrow-line"></div>
+    <span class="hero-eyebrow-text">Complimentary Wealth Review — By Invitation</span>
+  </div>
+
+  <h1 class="hero-headline">
+    Is your wealth working<br>
+    as hard as <em>you did</em><br>
+    to build it?
+  </h1>
+
+  <p class="hero-sub">
+    Most business owners in India are sitting on <strong>₹1Cr+ in idle or underperforming assets</strong> — locked in FDs, over-exposed to real estate, or simply unstructured. A 30-minute conversation changes that.
+  </p>
+
+  <div class="cta-group">
+    <a href="#book" class="cta-primary">
+      <span>Book Your Free 30-Min Call</span>
+      <span class="cta-arrow">→</span>
+    </a>
+    <span class="cta-note">No obligation. No sales pitch.</span>
+  </div>
+</section>
+
+<div class="divider"><div class="divider-line"></div></div>
+
+<!-- WHO IS THIS FOR -->
+<section class="who">
+  <div class="reveal">
+    <div class="section-label">
+      <div class="section-label-line"></div>
+      <span class="section-label-text">Who This Is For</span>
+    </div>
+    <h2 class="who-heading">Built for founders and business owners managing serious wealth.</h2>
+    <p class="who-body">This isn't a generic financial planning session. It's a focused conversation for people who have built real wealth and want it protected, structured, and growing.</p>
+  </div>
+
+  <div class="reveal">
+    <ul class="qualifier-list">
+      <li>You own or run a business generating ₹1Cr+ annually</li>
+      <li>You have ₹1Cr or more in personal assets outside your business</li>
+      <li>Your money is in FDs, real estate, or sitting in a current account</li>
+      <li>You've never had a dedicated wealth manager — only a bank RM</li>
+      <li>You want returns, liquidity, and tax efficiency — simultaneously</li>
+      <li>You're based in Delhi, Mumbai, or Bangalore</li>
+    </ul>
+  </div>
+</section>
+
+<div class="divider"><div class="divider-line"></div></div>
+
+<!-- WHAT YOU GET -->
+<section class="what">
+  <div class="what-inner">
+    <div class="what-header reveal">
+      <div class="section-label" style="justify-content:center">
+        <div class="section-label-line"></div>
+        <span class="section-label-text">What Happens in 30 Minutes</span>
+        <div class="section-label-line"></div>
+      </div>
+      <h2 class="what-heading">A conversation, not a pitch.</h2>
+    </div>
+
+    <div class="cards">
+      <div class="card reveal">
+        <div class="card-number">01</div>
+        <h3 class="card-title">Wealth Snapshot</h3>
+        <p class="card-body">We look at where your money currently sits — FDs, real estate, equities, cash — and identify what's costing you silently.</p>
+      </div>
+      <div class="card reveal">
+        <div class="card-number">02</div>
+        <h3 class="card-title">Gap Analysis</h3>
+        <p class="card-body">We map what your money could be doing — PMS, AIFs, structured products — compared to what it's doing today. The gap is almost always significant.</p>
+      </div>
+      <div class="card reveal">
+        <div class="card-number">03</div>
+        <h3 class="card-title">Clear Next Step</h3>
+        <p class="card-body">You leave with one specific, actionable recommendation. Whether we work together or not — the insight is yours to keep.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ADVISOR -->
+<section class="advisor">
+  <div class="advisor-photo reveal">
+    <div class="advisor-photo-frame">
+      <span class="photo-placeholder">MD</span>
+    </div>
+    <div class="advisor-photo-accent"></div>
+  </div>
+
+  <div class="advisor-info reveal">
+    <div class="section-label">
+      <div class="section-label-line"></div>
+      <span class="section-label-text">Your Advisor</span>
+    </div>
+
+    <h2 class="advisor-name">[MD Full Name]</h2>
+    <p class="advisor-title">Managing Director — iVentures Capital, Gurgaon</p>
+
+    <p class="advisor-bio">
+      [MD Name] has spent over [X] years working exclusively with HNI business owners and promoters across India. His approach is direct — no jargon, no generic advice. He looks at your specific situation and tells you exactly what he sees.
+      <br><br>
+      iVentures Capital manages wealth for a select group of clients who want genuine advisory, not product pushing. The firm works across PMS, AIFs, unlisted equity, and structured debt.
+    </p>
+
+    <div class="stats">
+      <div>
+        <div class="stat-value">[X]+</div>
+        <div class="stat-label">Years in Wealth Management</div>
+      </div>
+      <div>
+        <div class="stat-value">₹[X]Cr+</div>
+        <div class="stat-label">Assets Under Advisory</div>
+      </div>
+      <div>
+        <div class="stat-value">[X]+</div>
+        <div class="stat-label">HNI Clients Served</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"><div class="divider-line"></div></div>
+
+<!-- BOTTOM CTA -->
+<section class="bottom-cta" id="book">
+  <div class="bottom-cta-inner">
+    <div class="section-label reveal" style="justify-content:center">
+      <div class="section-label-line"></div>
+      <span class="section-label-text">Reserve Your Slot</span>
+      <div class="section-label-line"></div>
+    </div>
+
+    <h2 class="bottom-cta-heading reveal">
+      30 minutes.<br>
+      <em>One honest conversation.</em><br>
+      No strings attached.
+    </h2>
+
+    <p class="bottom-cta-sub reveal">
+      Slots are limited and reviewed before confirmation. This is a selective process — we want to make sure the conversation is genuinely useful for you.
+    </p>
+
+    <a href="YOUR_CALENDLY_LINK_HERE" target="_blank" class="cta-primary reveal">
+      <span>Schedule My Wealth Review Call</span>
+      <span class="cta-arrow">→</span>
+    </a>
+
+    <p class="cta-disclaimer">Complimentary. Confidential. 30 minutes via Zoom or in-person (Gurgaon).</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-brand">iVentures Capital</span>
+  <span class="footer-note">SEBI Registered Investment Adviser · Gurgaon, India</span>
+</footer>
+
+<script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Smooth anchor scroll
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+</script>
+</body>
+</html>
